@@ -1,8 +1,5 @@
 #include <stdlib.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_blas.h>
 #include <stdio.h>
-#include <time.h>
  
 void matmulA(double **a, double **b, double **c, int a_row, int common, int b_col)
 {
