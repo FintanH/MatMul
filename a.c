@@ -7,18 +7,18 @@
 void matmulA(double **a, double **b, double **c, int a_row, int common, int b_col)
 {
     #pragma omp parallel for
-    for (int i = 0; i < a_row; ++i)
+    for (int i = 0; i < a_row; i++)
     {
-       for (int j = 0; j < b_col; j+=2)
+        for (int j = 0; j < b_col; j+=2)
         {
             double sum = 0;
-            for (int k = 0; k < common; ++k)
+            for (int k = 0; k < common; k++)
             {
                 sum += a[i][k] * b[k][j];
             }
             c[i][j] = sum;
             sum = 0; 
-            for (int k = common-1; k >= 0; --k)
+            for (int k = common-1; k >= 0; k--)
             {
                 sum += a[i][k] * b[k][j+1];
             }
