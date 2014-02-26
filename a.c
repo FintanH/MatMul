@@ -47,16 +47,6 @@ void matmulB(double ** a, double ** b, double ** c, int a_row, int common, int b
     }
 }
 
-double ** g_to_d(gsl_matrix* matrix)
-{
-    double ** retval = malloc(sizeof(double*)*matrix->size1);
-    for(int i = 0; i < matrix->size1; i++)
-    {
-        retval[i] = (double*)&matrix->data[i*matrix->tda];
-    }
-    return retval;
-}
- 
 int main(int argsc, char** argv)
 {
     int a_row = 2000;
