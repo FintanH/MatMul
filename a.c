@@ -1,22 +1,24 @@
 #include <stdlib.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_blas.h>
 #include <stdio.h>
 #include <time.h>
  
 void matmulA(double **a, double **b, double **c, int a_row, int common, int b_col)
 {
     #pragma omp parallel for
-    for (int i = 0; i < a_row; i++)
+    for (int i = 0; i < a_row; ++i)
     {
-        for (int j = 0; j < b_col; j+=2)
+       for (int j = 0; j < b_col; j+=2)
         {
             double sum = 0;
-            for (int k = 0; k < common; k++)
+            for (int k = 0; k < common; ++k)
             {
                 sum += a[i][k] * b[k][j];
             }
             c[i][j] = sum;
             sum = 0; 
-            for (int k = common-1; k >= 0; k--)
+            for (int k = common-1; k >= 0; --k)
             {
                 sum += a[i][k] * b[k][j+1];
             }
@@ -25,7 +27,7 @@ void matmulA(double **a, double **b, double **c, int a_row, int common, int b_co
     }
 }
  
-void matmulB(double **a, double **b, double **c, int a_row, int common, int b_col)
+void matmulB(double ** a, double ** b, double ** c, int a_row, int common, int b_col)
 {
     #pragma omp parallel for
     for (int i = 0; i < a_row; i++)
@@ -47,13 +49,23 @@ void matmulB(double **a, double **b, double **c, int a_row, int common, int b_co
         }
     }
 }
+
+double ** g_to_d(gsl_matrix* matrix)
+{
+    double ** retval = malloc(sizeof(double*)*matrix->size1);
+    for(int i = 0; i < matrix->size1; i++)
+    {
+        retval[i] = (double*)&matrix->data[i*matrix->tda];
+    }
+    return retval;
+}
  
 int main(int argsc, char** argv)
 {
     int a_row = 2000;
     int common = 400;
-    int b_col = 400;
-
+    int b_col = 300;
+    
     double ** a = malloc(sizeof(double*)*a_row);
     for(int i = 0; i < a_row; i++)
     {
