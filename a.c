@@ -4,41 +4,55 @@
  
 void matmulA(double **a, double **b, double **c, int a_row, int common, int b_col)
 {
+    #pragma omp parallel for
     for (int i = 0; i < a_row; i++)
     {
-        for (int j = 0; j < common; j++)
+        for (int j = 0; j < b_col; j+=2)
         {
             double sum = 0;
-            for (int k = 0; k < b_col; k++)
+            for (int k = 0; k < common; k++)
             {
                 sum += a[i][k] * b[k][j];
             }
             c[i][j] = sum;
+            sum = 0; 
+            for (int k = common-1; k >= 0; k--)
+            {
+                sum += a[i][k] * b[k][j+1];
+            }
+            c[i][j+1] = sum;
         }
     }
 }
  
 void matmulB(double **a, double **b, double **c, int a_row, int common, int b_col)
 {
-    for (int i = 0; i != a_row; ++i)
+    #pragma omp parallel for
+    for (int i = 0; i < a_row; i++)
     {
-        for (int j = 0; j != common; ++j)
+        for (int j = 0; j < b_col; j+=2)
         {
             double sum = 0;
-            for (int k = 0; k < b_col; k++)
+            for (int k = 0; k < common; k++)
             {
                 sum += a[i][k] * b[k][j];
             }
             c[i][j] = sum;
+            sum = 0; 
+            for (int k = common-1; k >= 0; k--)
+            {
+                sum += a[i][k] * b[k][j+1];
+            }
+            c[i][j+1] = sum;
         }
     }
 }
  
 int main(int argsc, char** argv)
 {
-    int a_row = 20;
-    int common = 40;
-    int b_col = 40;
+    int a_row = 2000;
+    int common = 400;
+    int b_col = 400;
 
     double ** a = malloc(sizeof(double*)*a_row);
     for(int i = 0; i < a_row; i++)
@@ -57,18 +71,11 @@ int main(int argsc, char** argv)
     {
         c[i] = malloc(sizeof(double)*b_col);
     }
-        
 
-    clock_t start = clock();
     for(int i = 0; i < 100; i++)
         if(argv[1][0] == 'A')
             matmulA(a,b,c,a_row,common,b_col);
         else
             matmulB(a,b,c,a_row,common,b_col);
-
-    printf("Time for consumer %lu\n", clock()-start);
-
-
-    
 }
 
